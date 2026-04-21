@@ -1,0 +1,10 @@
+{
+  "$schema": "https://rork.com/schema/rork.json",
+  "apps": [
+    {
+      "name": "Proverbs 31 Pro",
+      "path": "expo",
+      "framework": "react-native"
+    }
+  ]
+}

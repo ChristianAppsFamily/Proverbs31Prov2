@@ -73,12 +73,20 @@ create policy "anyone views" on public.views for insert with check (true);
 
 -- Auto-create profile on signup
 create or replace function public.handle_new_user()
-returns trigger language plpgsql security definer as $$
+returns trigger 
+language plpgsql 
+security definer 
+set search_path = public
+as $$
 begin
   insert into public.user_profiles (id, display_name, avatar_url)
   values (
     new.id,
-    coalesce(new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'name', split_part(new.email,'@',1)),
+    coalesce(
+      new.raw_user_meta_data->>'full_name', 
+      new.raw_user_meta_data->>'name', 
+      split_part(new.email, '@', 1)
+    ),
     new.raw_user_meta_data->>'avatar_url'
   )
   on conflict (id) do nothing;
@@ -89,4 +97,5 @@ $$;
 drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
   after insert on auth.users
-  for each row execute function public.handle_new_user();
+  for each row 
+  execute function public.handle_new_user();

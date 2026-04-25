@@ -5,7 +5,7 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "com.christianappempire.proverbs31",
+    "scheme": "com.christianappempire.proverbs31pro",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {

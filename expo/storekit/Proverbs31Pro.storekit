@@ -1,0 +1,36 @@
+{
+  "identifier" : "A1B2C3D4-E5F6-4789-A012-34567890ABCD",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+    {
+      "displayPrice" : "4.99",
+      "familyShareable" : false,
+      "internalID" : "B2C3D4E5-F6A7-4890-B123-4567890ABCDE",
+      "localizations" : [
+        {
+          "description" : "Permanently removes banner ads in Proverbs 31 Pro.",
+          "displayName" : "Remove Ads",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "com.christianappempire.proverbs31pro.removeads",
+      "referenceName" : "Remove Ads",
+      "type" : "NonConsumable"
+    }
+  ],
+  "settings" : {
+    "_failTransactionsEnabled" : false,
+    "_storeKitErrors" : [
+
+    ]
+  },
+  "subscriptionGroups" : [
+
+  ],
+  "version" : {
+    "major" : 3,
+    "minor" : 0
+  }
+}

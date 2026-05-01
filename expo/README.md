@@ -11,11 +11,30 @@ This is a native cross-platform mobile app created with [Rork](https://rork.com)
 
 AdMob, App Tracking Transparency, and in-app purchases require a **development build**, not Expo Go.
 
-1. From this `expo` folder: `cp .env.example .env` and set `EXPO_PUBLIC_ADMOB_IOS_APP_ID` / `EXPO_PUBLIC_ADMOB_ANDROID_APP_ID` to your AdMob **app** IDs (the `ca-app-pub-…~…` values from AdMob → Apps → App settings). Banner **unit** IDs are already wired in code.
-2. Install dependencies: `npm install --legacy-peer-deps`
-3. Generate native projects: `npm run prebuild` (creates `ios/` and `android/` locally; they are gitignored here).
-4. Open the workspace: `xed ios` (or open `ios/*.xcworkspace` in Xcode), select your team for signing, choose your physical device, then **Run**.
-5. In App Store Connect, create the non-consumable IAP with product ID `com.christianappempire.proverbs31pro.removeads` so **Remove ads** and restore work on device.
+### One-time setup (from the `expo` folder)
+
+1. `cp .env.example .env` and set `EXPO_PUBLIC_ADMOB_IOS_APP_ID` (and Android if you ship Play) to your AdMob **app** IDs (`ca-app-pub-…~…` from AdMob → Apps → App settings). Banner **unit** IDs are already in `constants/monetization.ts`.
+2. `npm install --legacy-peer-deps`
+3. `npm run prebuild:ios` — generates `ios/` (gitignored). Use `npm run prebuild:ios:clean` if you need a clean regen.
+4. `npm run ios:pod` — installs CocoaPods (`LANG=en_US.UTF-8` if CocoaPods complains about locale).
+5. `npm run ios:open` — opens `ios/Proverbs31Pro.xcodeproj` in Xcode.
+
+### Signing and running on a device
+
+- In Xcode: select the **Proverbs31Pro** target → **Signing & Capabilities** → choose your **Team**, enable **Automatically manage signing**.
+- Pick your **iPhone** as the run destination (USB). Press **Run** (▶). The first launch installs the dev client and native modules.
+
+### StoreKit (test “Remove ads” without App Store Connect)
+
+- In Xcode: **File → Add File to “Proverbs31Pro”…** and add `storekit/Proverbs31Pro.storekit` (committed in this repo).
+- **Product → Scheme → Edit Scheme…** → **Run** → **Options** → **StoreKit Configuration** → choose **Proverbs31Pro**. Then run the app; the IAP sheet uses the local non-consumable `com.christianappempire.proverbs31pro.removeads`.
+- For real TestFlight/App Store purchases, clear that StoreKit configuration and use the product created in **App Store Connect** with the same product ID.
+
+### Publishing (local archive → TestFlight / App Store)
+
+- Bump **version** in `app.config.ts` when you ship new user-facing releases; bump **build** with env `EXPO_IOS_BUILD_NUMBER` (see `.env.example`) or edit `ios.buildNumber` after prebuild, then `npm run prebuild:ios` again so native projects pick it up.
+- In Xcode: **Product → Archive**. When the archive completes, use **Distribute App** and follow the App Store Connect flow.
+- Ensure the app record in App Store Connect uses bundle ID `com.christianappempire.proverbs31pro` and has the non-consumable IAP configured to match the app.
 
 ## How can I edit this code?
 

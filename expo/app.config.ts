@@ -32,6 +32,7 @@ export default (): ExpoConfig => ({
   ios: {
     supportsTablet: false,
     bundleIdentifier: "com.christianappempire.proverbs31pro",
+    buildNumber: process.env.EXPO_IOS_BUILD_NUMBER ?? "1",
     infoPlist: {
       ITSAppUsesNonExemptEncryption: false,
     },
@@ -74,6 +75,9 @@ export default (): ExpoConfig => ({
     [
       "expo-build-properties",
       {
+        ios: {
+          deploymentTarget: "15.1",
+        },
         android: {
           kotlinVersion: "2.1.20",
         },

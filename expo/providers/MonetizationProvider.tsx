@@ -75,6 +75,10 @@ export function MonetizationProvider({
         if (Platform.OS === "ios") {
           await TrackingTransparency.requestTrackingPermissionsAsync();
         }
+        // Production traffic: do not register test devices (no "EMULATOR" / device hashes).
+        mobileAds().setRequestConfiguration({
+          testDeviceIdentifiers: [],
+        });
         await mobileAds().initialize();
         if (!cancelled) setAdsSdkReady(true);
       } catch {

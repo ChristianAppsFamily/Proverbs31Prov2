@@ -13,7 +13,7 @@ AdMob, App Tracking Transparency, and in-app purchases require a **development b
 
 ### One-time setup (from the `expo` folder)
 
-1. `cp .env.example .env` and set `EXPO_PUBLIC_ADMOB_IOS_APP_ID` (and Android if you ship Play) to your AdMob **app** IDs (`ca-app-pub-…~…` from AdMob → Apps → App settings). Banner **unit** IDs are already in `constants/monetization.ts`.
+1. `cp .env.example .env` and set **`EXPO_PUBLIC_ADMOB_IOS_APP_ID`** to your real AdMob **iOS App ID** (`ca-app-pub-…~…` from AdMob → Apps → *your iOS app* → App settings). This is required for **production** ad traffic in Xcode and TestFlight (the repo no longer falls back to Google’s sample iOS App ID). Banner **unit** IDs in `constants/monetization.ts` are already your production units. Set Android’s App ID when you ship Play.
 2. `npm install --legacy-peer-deps`
 3. `npm run prebuild:ios` — generates `ios/` (gitignored). Use `npm run prebuild:ios:clean` if you need a clean regen.
 4. `npm run ios:pod` — installs CocoaPods (`LANG=en_US.UTF-8` if CocoaPods complains about locale).

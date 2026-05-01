@@ -1,5 +1,11 @@
 import { Platform } from "react-native";
 
+/**
+ * Banner unit IDs below are **production** AdMob units (not Google TestIds).
+ * `EXPO_PUBLIC_ADMOB_IOS_APP_ID` in `app.config.ts` must be the AdMob **App ID**
+ * for the same iOS app registration, or requests may be treated as test/invalid.
+ */
+
 /** Must match the non-consumable product in App Store Connect and Google Play Console. */
 export const REMOVE_ADS_PRODUCT_ID = "com.christianappempire.proverbs31pro.removeads";
 

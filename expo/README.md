@@ -25,6 +25,7 @@ AdMob, App Tracking Transparency, and in-app purchases require a **development b
   `rm -rf Pods Podfile.lock build` then `LANG=en_US.UTF-8 pod install` again. If it still fails, clear the CocoaPods download cache for React Native artifacts and retry (Xcode closed):  
   `pod cache clean --all` (slower next install) or remove the specific cached tarball under `~/Library/Caches/CocoaPods` and run `pod install` again.
 - **CDN / trunk errors** (`cdn.cocoapods.org` download failure): retry on a stable network; you can run `pod install` without `--repo-update` once specs are already synced.
+- **`Google-Mobile-Ads-SDK` folder missing** (or similar “non existent folder” under `Pods/`): the install was left half-done; quit Xcode, run `rm -rf Pods Podfile.lock build` inside `expo/ios`, then `LANG=en_US.UTF-8 pod install` once (no need for `--repo-update` unless you changed the Podfile).
 
 ### Signing and running on a device
 

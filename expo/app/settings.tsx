@@ -1,7 +1,7 @@
 import { Stack } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 import {
-  Ban,
+  Crown,
   Facebook,
   Instagram,
   Mail,
@@ -30,16 +30,16 @@ import { useMonetization } from "@/providers/MonetizationContext";
 export default function SettingsScreen() {
   const { notifications, setNotifications } = useEngagement();
   const {
-    adsRemoved,
-    removeAdsProduct,
+    isPro,
+    proProduct,
     purchaseBusy,
-    purchaseRemoveAds,
+    purchaseProUpgrade,
     restorePurchases,
   } = useMonetization();
 
-  const removeAdsLabel = adsRemoved
-    ? "Ads removed — thank you!"
-    : `Remove ads${removeAdsProduct?.displayPrice ? ` (${removeAdsProduct.displayPrice})` : " ($4.99)"}`;
+  const upgradeLabel = isPro
+    ? "Pro — thank you!"
+    : `Upgrade to Pro${proProduct?.displayPrice ? ` (${proProduct.displayPrice})` : " ($4.99)"}`;
 
   const openLink = async (url: string) => {
     try {
@@ -81,20 +81,20 @@ export default function SettingsScreen() {
           </View>
         </View>
 
-        <SectionHeading title="Privacy & purchases" />
+        <SectionHeading title="Privacy & Pro" />
         <PrimaryButton
           icon={<Shield size={18} color={Colors.white} />}
           label="Privacy policy"
           onPress={() => openLink(getPrivacyPolicyUrl())}
         />
         <PrimaryButton
-          icon={<Ban size={18} color={Colors.white} />}
-          label={removeAdsLabel}
+          icon={<Crown size={18} color={Colors.white} />}
+          label={upgradeLabel}
           onPress={() => {
-            if (adsRemoved) return;
-            void purchaseRemoveAds();
+            if (isPro) return;
+            void purchaseProUpgrade();
           }}
-          disabled={adsRemoved || purchaseBusy}
+          disabled={isPro || purchaseBusy}
         />
         <Pressable
           onPress={() => void restorePurchases()}

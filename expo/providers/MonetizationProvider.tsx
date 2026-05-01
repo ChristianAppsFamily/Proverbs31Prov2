@@ -1,22 +1,34 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as TrackingTransparency from "expo-tracking-transparency";
 import { useIAP, type Purchase } from "expo-iap";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Alert, Platform } from "react-native";
-import mobileAds from "react-native-google-mobile-ads";
 import {
-  ADS_ENTITLEMENT_STORAGE_KEY,
-  REMOVE_ADS_PRODUCT_ID,
-  REMOVE_ADS_PRODUCT_IDS,
+  LEGACY_REMOVE_ADS_ENTITLEMENT_KEY,
+  PRO_ENTITLEMENT_STORAGE_KEY,
+  PRO_UPGRADE_PRODUCT_ID,
+  PRO_UPGRADE_PRODUCT_IDS,
 } from "@/constants/monetization";
 import { MonetizationContext } from "@/providers/MonetizationContext";
 
-async function setEntitlementFlag(enabled: boolean) {
+async function setProEntitlement(enabled: boolean) {
   if (enabled) {
-    await AsyncStorage.setItem(ADS_ENTITLEMENT_STORAGE_KEY, "1");
+    await AsyncStorage.setItem(PRO_ENTITLEMENT_STORAGE_KEY, "1");
+    await AsyncStorage.removeItem(LEGACY_REMOVE_ADS_ENTITLEMENT_KEY);
   } else {
-    await AsyncStorage.removeItem(ADS_ENTITLEMENT_STORAGE_KEY);
+    await AsyncStorage.removeItem(PRO_ENTITLEMENT_STORAGE_KEY);
   }
+}
+
+async function readProEntitlement(): Promise<boolean> {
+  const pro = await AsyncStorage.getItem(PRO_ENTITLEMENT_STORAGE_KEY);
+  if (pro === "1") return true;
+  const legacy = await AsyncStorage.getItem(LEGACY_REMOVE_ADS_ENTITLEMENT_KEY);
+  if (legacy === "1") {
+    await AsyncStorage.setItem(PRO_ENTITLEMENT_STORAGE_KEY, "1");
+    await AsyncStorage.removeItem(LEGACY_REMOVE_ADS_ENTITLEMENT_KEY);
+    return true;
+  }
+  return false;
 }
 
 export function MonetizationProvider({
@@ -24,15 +36,14 @@ export function MonetizationProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const [adsRemoved, setAdsRemoved] = useState(false);
-  const [adsSdkReady, setAdsSdkReady] = useState(false);
+  const [isPro, setIsPro] = useState(false);
   const [purchaseBusy, setPurchaseBusy] = useState(false);
   const entitlementLoaded = useRef(false);
 
-  const applyPurchaseIfRemoveAds = useCallback(async (purchase: Purchase) => {
-    if (purchase.productId !== REMOVE_ADS_PRODUCT_ID) return;
-    await setEntitlementFlag(true);
-    setAdsRemoved(true);
+  const applyPurchaseIfPro = useCallback(async (purchase: Purchase) => {
+    if (purchase.productId !== PRO_UPGRADE_PRODUCT_ID) return;
+    await setProEntitlement(true);
+    setIsPro(true);
   }, []);
 
   const {
@@ -46,7 +57,7 @@ export function MonetizationProvider({
     restorePurchases: iapRestorePurchases,
   } = useIAP({
     onPurchaseSuccess: async (purchase) => {
-      await applyPurchaseIfRemoveAds(purchase);
+      await applyPurchaseIfPro(purchase);
       try {
         await finishTransaction({ purchase, isConsumable: false });
       } catch {
@@ -60,8 +71,7 @@ export function MonetizationProvider({
   useEffect(() => {
     void (async () => {
       try {
-        const v = await AsyncStorage.getItem(ADS_ENTITLEMENT_STORAGE_KEY);
-        if (v === "1") setAdsRemoved(true);
+        if (await readProEntitlement()) setIsPro(true);
       } finally {
         entitlementLoaded.current = true;
       }
@@ -69,33 +79,11 @@ export function MonetizationProvider({
   }, []);
 
   useEffect(() => {
-    let cancelled = false;
-    void (async () => {
-      try {
-        if (Platform.OS === "ios") {
-          await TrackingTransparency.requestTrackingPermissionsAsync();
-        }
-        // Production traffic: do not register test devices (no "EMULATOR" / device hashes).
-        mobileAds().setRequestConfiguration({
-          testDeviceIdentifiers: [],
-        });
-        await mobileAds().initialize();
-        if (!cancelled) setAdsSdkReady(true);
-      } catch {
-        if (!cancelled) setAdsSdkReady(true);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  useEffect(() => {
     if (!connected) return;
     void (async () => {
       try {
         await fetchProducts({
-          skus: [...REMOVE_ADS_PRODUCT_IDS],
+          skus: [...PRO_UPGRADE_PRODUCT_IDS],
           type: "in-app",
         });
       } catch {
@@ -105,7 +93,7 @@ export function MonetizationProvider({
   }, [connected, fetchProducts]);
 
   useEffect(() => {
-    if (!connected || !entitlementLoaded.current || adsRemoved) return;
+    if (!connected || !entitlementLoaded.current || isPro) return;
     void (async () => {
       try {
         await getAvailablePurchases();
@@ -113,23 +101,23 @@ export function MonetizationProvider({
         /* ignore */
       }
     })();
-  }, [connected, adsRemoved, getAvailablePurchases]);
+  }, [connected, isPro, getAvailablePurchases]);
 
   useEffect(() => {
-    if (adsRemoved) return;
+    if (isPro) return;
     const owned = availablePurchases.some(
-      (p) => p.productId === REMOVE_ADS_PRODUCT_ID,
+      (p) => p.productId === PRO_UPGRADE_PRODUCT_ID,
     );
     if (owned) {
-      void setEntitlementFlag(true);
-      setAdsRemoved(true);
+      void setProEntitlement(true);
+      setIsPro(true);
     }
-  }, [availablePurchases, adsRemoved]);
+  }, [availablePurchases, isPro]);
 
-  const removeAdsProduct =
-    products.find((p) => p.id === REMOVE_ADS_PRODUCT_ID) ?? null;
+  const proProduct =
+    products.find((p) => p.id === PRO_UPGRADE_PRODUCT_ID) ?? null;
 
-  const purchaseRemoveAds = useCallback(async () => {
+  const purchaseProUpgrade = useCallback(async () => {
     if (purchaseBusy) return;
     setPurchaseBusy(true);
     try {
@@ -137,14 +125,14 @@ export function MonetizationProvider({
         await requestPurchase({
           type: "in-app",
           request: {
-            apple: { sku: REMOVE_ADS_PRODUCT_ID },
+            apple: { sku: PRO_UPGRADE_PRODUCT_ID },
           },
         });
       } else {
         await requestPurchase({
           type: "in-app",
           request: {
-            google: { skus: [REMOVE_ADS_PRODUCT_ID] },
+            google: { skus: [PRO_UPGRADE_PRODUCT_ID] },
           },
         });
       }
@@ -169,21 +157,13 @@ export function MonetizationProvider({
 
   const value = useMemo(
     () => ({
-      adsRemoved,
-      adsSdkReady,
-      removeAdsProduct,
+      isPro,
+      proProduct,
       purchaseBusy,
-      purchaseRemoveAds,
+      purchaseProUpgrade,
       restorePurchases,
     }),
-    [
-      adsRemoved,
-      adsSdkReady,
-      removeAdsProduct,
-      purchaseBusy,
-      purchaseRemoveAds,
-      restorePurchases,
-    ],
+    [isPro, proProduct, purchaseBusy, purchaseProUpgrade, restorePurchases],
   );
 
   return (

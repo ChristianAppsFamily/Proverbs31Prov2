@@ -7,13 +7,13 @@ This is a native cross-platform mobile app created with [Rork](https://rork.com)
 **Platform**: Native iOS & Android app, exportable to web
 **Framework**: Expo Router + React Native
 
-## iPhone build (Xcode + AdMob + StoreKit)
+## iPhone build (Xcode + StoreKit)
 
-AdMob, App Tracking Transparency, and in-app purchases require a **development build**, not Expo Go.
+In-app purchases (Pro upgrade) require a **development build**, not Expo Go.
 
 ### One-time setup (from the `expo` folder)
 
-1. `cp .env.example .env` and set **`EXPO_PUBLIC_ADMOB_IOS_APP_ID`** to your real AdMob **iOS App ID** (`ca-app-pub-…~…` from AdMob → Apps → *your iOS app* → App settings). This is required for **production** ad traffic in Xcode and TestFlight (the repo no longer falls back to Google’s sample iOS App ID). Banner **unit** IDs in `constants/monetization.ts` are already your production units. Set Android’s App ID when you ship Play.
+1. Optional: `cp .env.example .env` if you use `EXPO_PUBLIC_PRIVACY_POLICY_URL` or `EXPO_IOS_BUILD_NUMBER`.
 2. `npm install --legacy-peer-deps`
 3. `npm run prebuild:ios` — generates `ios/` (gitignored). Use `npm run prebuild:ios:clean` if you need a clean regen.
 4. `npm run ios:pod` — installs CocoaPods (`LANG=en_US.UTF-8` if CocoaPods complains about locale).
@@ -25,14 +25,13 @@ AdMob, App Tracking Transparency, and in-app purchases require a **development b
   `rm -rf Pods Podfile.lock build` then `LANG=en_US.UTF-8 pod install` again. If it still fails, clear the CocoaPods download cache for React Native artifacts and retry (Xcode closed):  
   `pod cache clean --all` (slower next install) or remove the specific cached tarball under `~/Library/Caches/CocoaPods` and run `pod install` again.
 - **CDN / trunk errors** (`cdn.cocoapods.org` download failure): retry on a stable network; you can run `pod install` without `--repo-update` once specs are already synced.
-- **`Google-Mobile-Ads-SDK` folder missing** (or similar “non existent folder” under `Pods/`): the install was left half-done; quit Xcode, run `rm -rf Pods Podfile.lock build` inside `expo/ios`, then `LANG=en_US.UTF-8 pod install` once (no need for `--repo-update` unless you changed the Podfile).
 
 ### Signing and running on a device
 
 - In Xcode: select the **Proverbs31Pro** target → **Signing & Capabilities** → choose your **Team**, enable **Automatically manage signing**.
 - Pick your **iPhone** as the run destination (USB). Press **Run** (▶). The first launch installs the dev client and native modules.
 
-### StoreKit (test “Remove ads” without App Store Connect)
+### StoreKit (test “Upgrade to Pro” without App Store Connect)
 
 - In Xcode: **File → Add File to “Proverbs31Pro”…** and add `storekit/Proverbs31Pro.storekit` (committed in this repo).
 - **Product → Scheme → Edit Scheme…** → **Run** → **Options** → **StoreKit Configuration** → choose **Proverbs31Pro**. Then run the app; the IAP sheet uses the local non-consumable `com.christianappempire.proverbs31pro.removeads`.
@@ -310,7 +309,7 @@ Monetize your app:
 
 **Native In-App Purchases (requires Custom Development Build):**
 
-- **expo-iap** (StoreKit / Play Billing) — This app uses **expo-iap** for the one-time **Remove Ads** product (`com.christianappempire.proverbs31pro.removeads`). Create that non-consumable in App Store Connect and the same product ID in Google Play. Receipt validation is client-side for unlocking UI; tighten with server verification when you are ready.
+- **expo-iap** (StoreKit / Play Billing) — This app uses **expo-iap** for the one-time **Upgrade to Pro** product (`com.christianappempire.proverbs31pro.removeads`). Create that non-consumable in App Store Connect and the same product ID in Google Play. Receipt validation is client-side for unlocking UI; tighten with server verification when you are ready.
 
 **Paywall Optimization:**
 

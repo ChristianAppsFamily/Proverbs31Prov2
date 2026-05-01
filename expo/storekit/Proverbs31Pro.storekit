@@ -10,13 +10,13 @@
       "internalID" : "B2C3D4E5-F6A7-4890-B123-4567890ABCDE",
       "localizations" : [
         {
-          "description" : "Permanently removes banner ads in Proverbs 31 Pro.",
-          "displayName" : "Remove Ads",
+          "description" : "Unlocks the full Proverbs 31 Pro experience on this device.",
+          "displayName" : "Upgrade to Pro",
           "locale" : "en_US"
         }
       ],
       "productID" : "com.christianappempire.proverbs31pro.removeads",
-      "referenceName" : "Remove Ads",
+      "referenceName" : "Upgrade to Pro",
       "type" : "NonConsumable"
     }
   ],

@@ -2,11 +2,10 @@ import { createContext, useContext } from "react";
 import type { Product } from "expo-iap";
 
 export type MonetizationContextValue = {
-  adsRemoved: boolean;
-  adsSdkReady: boolean;
-  removeAdsProduct: Product | null;
+  isPro: boolean;
+  proProduct: Product | null;
   purchaseBusy: boolean;
-  purchaseRemoveAds: () => Promise<void>;
+  purchaseProUpgrade: () => Promise<void>;
   restorePurchases: () => Promise<void>;
 };
 

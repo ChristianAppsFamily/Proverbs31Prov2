@@ -1,25 +1,13 @@
-import { BottomTabBar, type BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { Tabs } from "expo-router";
 import { BookHeart, BookOpen, Feather, Heart } from "lucide-react-native";
 import React from "react";
 import { Platform, StyleSheet, View } from "react-native";
-import { AdBanner } from "@/components/AdBanner";
 import Colors from "@/constants/colors";
 import { Fonts } from "@/constants/fonts";
-
-function TabBarWithBanner(props: BottomTabBarProps) {
-  return (
-    <View style={styles.tabBarColumn}>
-      <AdBanner />
-      <BottomTabBar {...props} />
-    </View>
-  );
-}
 
 export default function TabLayout() {
   return (
     <Tabs
-      tabBar={(props) => <TabBarWithBanner {...props} />}
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: Colors.plum,
@@ -112,9 +100,6 @@ function TabIcon({
 }
 
 const styles = StyleSheet.create({
-  tabBarColumn: {
-    backgroundColor: Colors.white,
-  },
   iconWrap: { alignItems: "center", justifyContent: "center", gap: 4 },
   dot: {
     width: 4,

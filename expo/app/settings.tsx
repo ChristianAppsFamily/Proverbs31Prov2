@@ -1,10 +1,12 @@
 import { Stack } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 import {
+  Ban,
   Facebook,
   Instagram,
   Mail,
   MoreHorizontal,
+  Shield,
   Star,
   Users,
 } from "lucide-react-native";
@@ -21,10 +23,23 @@ import {
 } from "react-native";
 import Colors from "@/constants/colors";
 import { Fonts } from "@/constants/fonts";
+import { getPrivacyPolicyUrl } from "@/constants/links";
 import { useEngagement } from "@/providers/EngagementProvider";
+import { useMonetization } from "@/providers/MonetizationContext";
 
 export default function SettingsScreen() {
   const { notifications, setNotifications } = useEngagement();
+  const {
+    adsRemoved,
+    removeAdsProduct,
+    purchaseBusy,
+    purchaseRemoveAds,
+    restorePurchases,
+  } = useMonetization();
+
+  const removeAdsLabel = adsRemoved
+    ? "Ads removed — thank you!"
+    : `Remove ads${removeAdsProduct?.displayPrice ? ` (${removeAdsProduct.displayPrice})` : " ($4.99)"}`;
 
   const openLink = async (url: string) => {
     try {
@@ -65,6 +80,32 @@ export default function SettingsScreen() {
             />
           </View>
         </View>
+
+        <SectionHeading title="Privacy & purchases" />
+        <PrimaryButton
+          icon={<Shield size={18} color={Colors.white} />}
+          label="Privacy policy"
+          onPress={() => openLink(getPrivacyPolicyUrl())}
+        />
+        <PrimaryButton
+          icon={<Ban size={18} color={Colors.white} />}
+          label={removeAdsLabel}
+          onPress={() => {
+            if (adsRemoved) return;
+            void purchaseRemoveAds();
+          }}
+          disabled={adsRemoved || purchaseBusy}
+        />
+        <Pressable
+          onPress={() => void restorePurchases()}
+          style={({ pressed }) => [
+            styles.restoreLink,
+            pressed && { opacity: 0.75 },
+          ]}
+          testID="btn-restore-purchases"
+        >
+          <Text style={styles.restoreLinkText}>Restore purchases</Text>
+        </Pressable>
 
         <SectionHeading title="Support Us" />
         <Text style={styles.paragraph}>
@@ -138,17 +179,21 @@ function PrimaryButton({
   icon,
   label,
   onPress,
+  disabled,
 }: {
   icon: React.ReactNode;
   label: string;
   onPress: () => void;
+  disabled?: boolean;
 }) {
   return (
     <Pressable
       onPress={onPress}
+      disabled={disabled}
       style={({ pressed }) => [
         styles.primaryBtn,
-        pressed && { opacity: 0.92, transform: [{ scale: 0.995 }] },
+        disabled && { opacity: 0.55 },
+        pressed && !disabled && { opacity: 0.92, transform: [{ scale: 0.995 }] },
       ]}
       testID={`btn-${label}`}
     >
@@ -326,5 +371,19 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: Colors.inkMuted,
     letterSpacing: 0.3,
+  },
+  restoreLink: {
+    alignSelf: "center",
+    marginTop: 4,
+    marginBottom: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+  },
+  restoreLinkText: {
+    fontFamily: Fonts.sans,
+    fontSize: 14,
+    fontWeight: "600",
+    color: Colors.plum,
+    textDecorationLine: "underline",
   },
 });

@@ -7,6 +7,16 @@ This is a native cross-platform mobile app created with [Rork](https://rork.com)
 **Platform**: Native iOS & Android app, exportable to web
 **Framework**: Expo Router + React Native
 
+## iPhone build (Xcode + AdMob + StoreKit)
+
+AdMob, App Tracking Transparency, and in-app purchases require a **development build**, not Expo Go.
+
+1. From this `expo` folder: `cp .env.example .env` and set `EXPO_PUBLIC_ADMOB_IOS_APP_ID` / `EXPO_PUBLIC_ADMOB_ANDROID_APP_ID` to your AdMob **app** IDs (the `ca-app-pub-…~…` values from AdMob → Apps → App settings). Banner **unit** IDs are already wired in code.
+2. Install dependencies: `npm install --legacy-peer-deps`
+3. Generate native projects: `npm run prebuild` (creates `ios/` and `android/` locally; they are gitignored here).
+4. Open the workspace: `xed ios` (or open `ios/*.xcworkspace` in Xcode), select your team for signing, choose your physical device, then **Run**.
+5. In App Store Connect, create the non-consumable IAP with product ID `com.christianappempire.proverbs31pro.removeads` so **Remove ads** and restore work on device.
+
 ## How can I edit this code?
 
 There are several ways of editing your native mobile application.
@@ -273,8 +283,7 @@ Monetize your app:
 
 **Native In-App Purchases (requires Custom Development Build):**
 
-- **RevenueCat** - Cross-platform in-app purchases and subscriptions - [Expo Integration Guide](https://www.revenuecat.com/docs/expo)
-- **Expo In-App Purchases** - Direct App Store/Google Play integration - [Implementation Guide](https://docs.expo.dev/versions/latest/sdk/in-app-purchases/)
+- **expo-iap** (StoreKit / Play Billing) — This app uses **expo-iap** for the one-time **Remove Ads** product (`com.christianappempire.proverbs31pro.removeads`). Create that non-consumable in App Store Connect and the same product ID in Google Play. Receipt validation is client-side for unlocking UI; tighten with server verification when you are ready.
 
 **Paywall Optimization:**
 

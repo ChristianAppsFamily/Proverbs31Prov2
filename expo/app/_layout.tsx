@@ -11,6 +11,7 @@ import { DevotionalRotationProvider } from "@/providers/DevotionalRotationProvid
 import { EngagementProvider } from "@/providers/EngagementProvider";
 import { FavoritesProvider } from "@/providers/FavoritesProvider";
 import { JournalProvider } from "@/providers/JournalProvider";
+import { MonetizationProvider } from "@/providers/MonetizationProvider";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -55,16 +56,18 @@ export default function RootLayout() {
       <SafeAreaProvider>
         <GestureHandlerRootView style={{ flex: 1, backgroundColor: Colors.cream }}>
           <AuthProvider>
-            <FavoritesProvider>
-              <JournalProvider>
-                <EngagementProvider>
-                  <DevotionalRotationProvider>
-                    <StatusBar style="dark" />
-                    <RootLayoutNav />
-                  </DevotionalRotationProvider>
-                </EngagementProvider>
-              </JournalProvider>
-            </FavoritesProvider>
+            <MonetizationProvider>
+              <FavoritesProvider>
+                <JournalProvider>
+                  <EngagementProvider>
+                    <DevotionalRotationProvider>
+                      <StatusBar style="dark" />
+                      <RootLayoutNav />
+                    </DevotionalRotationProvider>
+                  </EngagementProvider>
+                </JournalProvider>
+              </FavoritesProvider>
+            </MonetizationProvider>
           </AuthProvider>
         </GestureHandlerRootView>
       </SafeAreaProvider>

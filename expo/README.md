@@ -19,6 +19,13 @@ AdMob, App Tracking Transparency, and in-app purchases require a **development b
 4. `npm run ios:pod` — installs CocoaPods (`LANG=en_US.UTF-8` if CocoaPods complains about locale).
 5. `npm run ios:open` — opens `ios/Proverbs31Pro.xcodeproj` in Xcode.
 
+### If `pod install` fails (`ReactNativeDependencies`, ENOENT, or CDN)
+
+- **Stale or partial Pods** (common `No such file or directory` under `Pods/ReactNativeDependencies/...`): from `expo/ios` run  
+  `rm -rf Pods Podfile.lock build` then `LANG=en_US.UTF-8 pod install` again. If it still fails, clear the CocoaPods download cache for React Native artifacts and retry (Xcode closed):  
+  `pod cache clean --all` (slower next install) or remove the specific cached tarball under `~/Library/Caches/CocoaPods` and run `pod install` again.
+- **CDN / trunk errors** (`cdn.cocoapods.org` download failure): retry on a stable network; you can run `pod install` without `--repo-update` once specs are already synced.
+
 ### Signing and running on a device
 
 - In Xcode: select the **Proverbs31Pro** target → **Signing & Capabilities** → choose your **Team**, enable **Automatically manage signing**.

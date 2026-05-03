@@ -17,7 +17,7 @@ In-app purchases (Pro upgrade) require a **development build**, not Expo Go.
 2. `npm install --legacy-peer-deps`
 3. `npm run prebuild:ios` — generates `ios/` (gitignored). Use `npm run prebuild:ios:clean` if you need a clean regen.
 4. `npm run ios:pod` — installs CocoaPods (`LANG=en_US.UTF-8` if CocoaPods complains about locale).
-5. `npm run ios:open` — opens `ios/Proverbs31Pro.xcodeproj` in Xcode.
+5. `npm run ios:open` — opens `ios/Proverbs31Pro.xcworkspace` in Xcode (required after CocoaPods).
 
 ### If `pod install` fails (`ReactNativeDependencies`, ENOENT, or CDN)
 

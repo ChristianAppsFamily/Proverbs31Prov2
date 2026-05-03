@@ -19,6 +19,14 @@ In-app purchases (Pro upgrade) require a **development build**, not Expo Go.
 4. `npm run ios:pod` — installs CocoaPods (`LANG=en_US.UTF-8` if CocoaPods complains about locale).
 5. `npm run ios:open` — opens `ios/Proverbs31Pro.xcworkspace` in Xcode (required after CocoaPods).
 
+### If Xcode fails with “module map … not found” or “No such module ‘Expo’”
+
+- Open **`ios/Proverbs31Pro.xcworkspace`**, not the `.xcodeproj`.
+- **Product → Clean Build Folder**, quit Xcode, delete Derived Data for this app, then reopen the workspace and build:  
+  `rm -rf ~/Library/Developer/Xcode/DerivedData/Proverbs31Pro-*`
+- From `expo/ios`, run `LANG=en_US.UTF-8 pod install` again after any `prebuild` or dependency change.
+- The repo includes a small config plugin (`plugins/withIosBuildFixes.js`) that corrects a bad **`LIBRARY_SEARCH_PATHS`** line in the generated `project.pbxproj` after `expo prebuild`; if you regenerated `ios/` before that plugin existed, run `npm run prebuild:ios` once so the fix applies, or keep the corrected line: two paths, `"$(SDKROOT)/usr/lib/swift"` and `"$(inherited)"`, not a single mangled string.
+
 ### If `pod install` fails (`ReactNativeDependencies`, ENOENT, or CDN)
 
 - **Stale or partial Pods** (common `No such file or directory` under `Pods/ReactNativeDependencies/...`): from `expo/ios` run  

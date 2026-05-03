@@ -37,6 +37,7 @@ export default (): ExpoConfig => ({
     favicon: "./assets/images/favicon.png",
   },
   plugins: [
+    "./plugins/withIosBuildFixes",
     [
       "expo-router",
       {
